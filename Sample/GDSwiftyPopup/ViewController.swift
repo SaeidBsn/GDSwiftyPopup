@@ -22,12 +22,12 @@ class ViewController: UIViewController, DismissViewDelegate {
         super.didReceiveMemoryWarning()
     }
     
-    @IBAction func show(sender: AnyObject){
+    @IBAction func show(_ sender: AnyObject){
         createPopup()
     }
     
     func createPopup(){
-        let confirmView = NSBundle.mainBundle().loadNibNamed("AlertView", owner: self, options: nil)[0] as? AlertView
+        let confirmView = Bundle.main.loadNibNamed("AlertView", owner: self, options: nil)?[0] as? AlertView
         confirmView?.confrimDelegate = self
         confirmView?.prepareView("I am a sample view! here can be any custom view!! :D", confirmTitle: "OK")
         
@@ -36,15 +36,15 @@ class ViewController: UIViewController, DismissViewDelegate {
         
         //select dismiss type of popup view
         //Options: None, BounceOut, FadeOut, SlideOut, GrowOut
-        popupView.dismissType = .BounceOut
+        popupView.dismissType = .fadeOut
         
         //select show type of popup view
         //Options: None, BounceOt, FadeIn, SlideIn, GrowIn
-        popupView.showType = .BounceIn
+        popupView.showType = .growIn
         
         //select if background should be dimmed or not
         //Options: Dimmed, Clear
-        popupView.dimmedType = .Dimmed
+        popupView.dimmedType = .dimmed
         
         //Popup view can be automatically dismissed.
         //autoDismiss presents if it should automatically dismissed or not
@@ -59,9 +59,9 @@ class ViewController: UIViewController, DismissViewDelegate {
         popupView.dismissOnPopupTouch = false
         
         //create the popup view and show it in current view
-        popupView.createPopupView(self.view, centerPoint: CGPointMake(self.view.center.x, self.view.center.y))
+        popupView.createPopupView(self.view, centerPoint: CGPoint(x: self.view.center.x, y: self.view.center.y))
     }
-    
+        
     func onDismissed() {
         popupView.dismiss()
     }

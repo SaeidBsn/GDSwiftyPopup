@@ -24,18 +24,18 @@ class AlertView: UIView {
         self.translatesAutoresizingMaskIntoConstraints = false
     }
     
-    func prepareView(title: String, confirmTitle: String){
+    func prepareView(_ title: String, confirmTitle: String){
         self.titleLabel.text = title
         
-        self.dismissButton.setTitle(confirmTitle, forState: .Normal)
-        self.dismissButton.backgroundColor = UIColor.redColor().colorWithAlphaComponent(0.5)
+        self.dismissButton.setTitle(confirmTitle, for: UIControlState())
+        self.dismissButton.backgroundColor = UIColor.red.withAlphaComponent(0.5)
         self.dismissButton.layer.cornerRadius = 4.0
-        self.dismissButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
+        self.dismissButton.setTitleColor(UIColor.white, for: UIControlState())
         
         self.layoutIfNeeded()
     }
     
-    @IBAction func dismiss(sender: UIButton){
+    @IBAction func dismiss(_ sender: UIButton){
         confrimDelegate?.onDismissed()
     }
     

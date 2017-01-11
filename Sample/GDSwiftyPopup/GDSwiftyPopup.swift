@@ -4,56 +4,55 @@
 //
 //  Created by Saeid Basirnia on 5/12/16.
 //  Copyright © 2016 Saeidbsn. All rights reserved.
-//
+//  saeidbsn.com
 
 import UIKit
 
 enum ViewDismissType: Int{
-    case None
-    case FadeOut
-    case SlideOut
-    case BounceOut
-    case GrowOut
+    case none
+    case fadeOut
+    case slideOut
+    case bounceOut
+    case growOut
 }
 
-enum ViewShowType{
-    case None
-    case FadeIn
-    case SlideIn
-    case BounceIn
-    case GrowIn
+enum ViewShowType: Int{
+    case none
+    case fadeIn
+    case slideIn
+    case bounceIn
+    case growIn
 }
 
 enum ViewDimmedType{
-    case Dimmed
-    case Clear
+    case dimmed
+    case clear
 }
 
 class GDSwiftyPopup: UIView {
-    private var containerView: UIView!
-    private var backgroundView: UIView!
+    var containerView: UIView!
+    var backgroundView: UIView!
     
-    var dimmedBackground: Bool = true
     var dismissOnTouch: Bool = false
     var dismissOnPopupTouch: Bool = false
     
     var isDismissing: Bool = false
     var isShowing: Bool = false
-    var isShow: Bool = false
+    var isPresented: Bool = false
     
     var autoDismiss: Bool = false
     var autoDismissDelay: Double = 3.0
     
-    var showType: ViewShowType = .None
-    var dismissType: ViewDismissType = .None
-    var dimmedType: ViewDimmedType = .Dimmed
+    var showType: ViewShowType = .none
+    var dismissType: ViewDismissType = .none
+    var dimmedType: ViewDimmedType = .dimmed
     
     
     //Initialize view
     init(containerView: UIView){
-        super.init(frame: UIScreen.mainScreen().bounds)
+        super.init(frame: UIScreen.main.bounds)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(self.didRotate(_:)), name: UIDeviceOrientationDidChangeNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.didRotate(_:)), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
         
         self.containerView = containerView
     }
@@ -63,11 +62,11 @@ class GDSwiftyPopup: UIView {
     }
     
     //Setup View
-    func createPopupView(inView: UIView, centerPoint: CGPoint){
+    func createPopupView(_ inView: UIView, centerPoint: CGPoint){
         self.setupBackgroundView()
-        self.containerView.userInteractionEnabled = true
+        self.containerView.isUserInteractionEnabled = true
         self.containerView.center = centerPoint
-        self.userInteractionEnabled = true
+        self.isUserInteractionEnabled = true
         
         self.addSubview(backgroundView)
         
@@ -82,32 +81,24 @@ class GDSwiftyPopup: UIView {
     func setupBackgroundView(){
         self.backgroundView = UIView()
         self.backgroundView.frame = self.frame
-        self.backgroundView.userInteractionEnabled = true
+        self.backgroundView.isUserInteractionEnabled = true
         
-        if dimmedType == .Clear{
-            self.backgroundView.backgroundColor = UIColor.clearColor()
-        }else if dimmedType == .Dimmed{
-            self.backgroundView.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.1)
+        if dimmedType == .clear{
+            self.backgroundView.backgroundColor = UIColor.clear
+        }else if dimmedType == .dimmed{
+            self.backgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.1)
         }else{
             self.backgroundView.removeFromSuperview()
         }
     }
     
-    func dimBackground(){
-        if dimmedBackground{
-            self.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.5)
-        }else{
-            self.backgroundColor = UIColor.clearColor()
-        }
-    }
-    
-    override func hitTest(point: CGPoint, withEvent event: UIEvent?) -> UIView? {
-        let touchedRect = CGRectInset(self.bounds, -10, -10)
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let touchedRect = self.bounds.insetBy(dx: -10, dy: -10)
         
-        if CGRectContainsPoint(touchedRect, point){
-            for v in self.subviews.reverse(){
-                let cPoint = v.convertPoint(point, fromView: self)
-                let hitView = v.hitTest(cPoint, withEvent: event)
+        if touchedRect.contains(point){
+            for v in self.subviews.reversed(){
+                let cPoint = v.convert(point, from: self)
+                let hitView = v.hitTest(cPoint, with: event)
                 
                 if (hitView != nil){
                     if dismissOnTouch{
@@ -129,8 +120,8 @@ class GDSwiftyPopup: UIView {
     
     
     //Action functions
-    func didRotate(sender: NSNotification){
-        if(UIDeviceOrientationIsLandscape(UIDevice.currentDevice().orientation)){
+    func didRotate(_ sender: Notification){
+        if(UIDeviceOrientationIsLandscape(UIDevice.current.orientation)){
             guard let sView = superview else{
                 return
             }
@@ -138,7 +129,7 @@ class GDSwiftyPopup: UIView {
             self.backgroundView.frame = self.frame
         }
         
-        if(UIDeviceOrientationIsPortrait(UIDevice.currentDevice().orientation)){
+        if(UIDeviceOrientationIsPortrait(UIDevice.current.orientation)){
             guard let sView = superview else{
                 return
             }
@@ -150,86 +141,86 @@ class GDSwiftyPopup: UIView {
     func setupConstraints(){
         let rightConstraint = NSLayoutConstraint(
             item: self.containerView,
-            attribute: .Right,
-            relatedBy: .Equal,
+            attribute: .right,
+            relatedBy: .equal,
             toItem: self,
-            attribute: .Right,
+            attribute: .right,
             multiplier: 1.0,
             constant: -20)
         let leftConstraint = NSLayoutConstraint(
             item: self.containerView,
-            attribute: .Left,
-            relatedBy: .Equal,
+            attribute: .left,
+            relatedBy: .equal,
             toItem: self,
-            attribute: .Left,
+            attribute: .left,
             multiplier: 1.0,
             constant: 20)
         let centerConstraint = NSLayoutConstraint(
             item: self.containerView,
-            attribute: .CenterY,
-            relatedBy: .Equal,
+            attribute: .centerY,
+            relatedBy: .equal,
             toItem: self,
-            attribute: .CenterY,
+            attribute: .centerY,
             multiplier: 1.0,
             constant: 0)
         
         self.addConstraints([rightConstraint, leftConstraint, centerConstraint])
     }
     
-    func show(){
+    private func show(){
         if !isShowing && !isDismissing{
             isShowing = !isShowing
             
             switch showType{
-            case .None:
+            case .none:
                 self.addSubview(self.containerView)
                 
-                UIView.animateWithDuration(0.1, delay: 0.0, options: [], animations: {
+                UIView.animate(withDuration: 0.1, delay: 0.0, options: [], animations: {
                     }, completion: showCompletionBlock())
                 
                 break
-            case .SlideIn:
+            case .slideIn:
                 self.addSubview(self.containerView)
                 
                 var frame = self.containerView.frame
                 frame.origin.y = -50
                 containerView.frame = frame
                 
-                UIView.animateWithDuration(0.4, delay: 0.0, usingSpringWithDamping: 3, initialSpringVelocity: 0.2, options: [.CurveEaseInOut], animations: {
+                UIView.animate(withDuration: 0.4, delay: 0.0, usingSpringWithDamping: 3, initialSpringVelocity: 0.2, options: UIViewAnimationOptions(), animations: {
                     self.containerView.center.y = self.center.y
                     }, completion: showCompletionBlock())
                 
                 break
-            case .BounceIn:
+            case .bounceIn:
                 self.addSubview(self.containerView)
                 
                 var frame = self.containerView.frame
                 frame.origin.y = -50
                 containerView.frame = frame
                 
-                UIView.animateWithDuration(0.6, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.2, options: [.CurveEaseInOut], animations: {
+                UIView.animate(withDuration: 0.6, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.2, options: UIViewAnimationOptions(), animations: {
                     self.containerView.center.y = self.center.y
                     }, completion: showCompletionBlock())
                 
                 break
-            case .FadeIn:
+            case .fadeIn:
                 self.addSubview(self.containerView)
                 
                 self.containerView.alpha = 0.0
-                UIView.animateWithDuration(0.5, animations: {
+                UIView.animate(withDuration: 0.5, animations: {
                     self.containerView.alpha = 1.0
                     }, completion: showCompletionBlock())
                 
                 break
-            case .GrowIn:
+            case .growIn:
                 self.addSubview(self.containerView)
                 
                 self.containerView.alpha = 0.0
-                self.containerView.transform = CGAffineTransformMakeScale(0, 0)
+                self.containerView.transform = CGAffineTransform(scaleX: 0, y: 0)
                 
-                UIView.animateWithDuration(0.6, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.2, options: [], animations: {
+                UIView.animate(withDuration: 0.6, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.2, options: [], animations: {
                     self.containerView.alpha = 1.0
-                    self.containerView.transform = CGAffineTransformMakeScale(1.0, 1.0)
+                    self.containerView.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
                     }, completion: showCompletionBlock())
                 break
             }
@@ -237,74 +228,74 @@ class GDSwiftyPopup: UIView {
     }
     
     func dismiss(){
-        if !isDismissing && isShow{
+        if !isDismissing && isPresented{
             isDismissing = !isDismissing
             
             switch dismissType{
-            case .None:
+            case .none:
                 self.isDismissing = false
-                self.isShow = false
+                self.isPresented = false
                 self.isShowing = false
                 
                 self.removeFromSuperview()
                 
                 break
-            case .SlideOut:
+            case .slideOut:
                 var frame = self.containerView.frame
                 
-                UIView.animateWithDuration(0.4, delay: 0.0, usingSpringWithDamping: 3, initialSpringVelocity: 0.2, options: [.CurveEaseOut], animations: {
+                UIView.animate(withDuration: 0.4, delay: 0.0, usingSpringWithDamping: 3, initialSpringVelocity: 0.2, options: [.curveEaseOut], animations: {
                     frame.origin.y = self.frame.height + 50
                     self.containerView.frame = frame
                     }, completion: { _ in
                         self.isDismissing = false
-                        self.isShow = false
+                        self.isPresented = false
                         self.isShowing = false
                         
                         self.removeFromSuperview()
                 })
                 
                 break
-            case .BounceOut:
+            case .bounceOut:
                 var frame = self.containerView.frame
                 
-                UIView.animateWithDuration(0.2, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.2, options: [.CurveEaseInOut], animations: {
+                UIView.animate(withDuration: 0.2, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.2, options: UIViewAnimationOptions(), animations: {
                     frame.origin.y -= 50
                     self.containerView.frame = frame
                     }, completion: { _ in
-                        UIView.animateWithDuration(0.4, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.2, options: [.CurveEaseInOut], animations: {
+                        UIView.animate(withDuration: 0.4, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.2, options: UIViewAnimationOptions(), animations: {
                             frame.origin.y = self.frame.height + 50
                             self.containerView.frame = frame
                             }, completion:  { _ in
                                 self.isDismissing = false
-                                self.isShow = false
+                                self.isPresented = false
                                 self.isShowing = false
                                 
                                 self.removeFromSuperview()
                         })
                 })
                 break
-            case .FadeOut:
-                UIView.animateWithDuration(0.5, animations: {
+            case .fadeOut:
+                UIView.animate(withDuration: 0.5, animations: {
                     self.containerView.alpha = 0.0
                     }, completion: { _ in
                         self.isDismissing = false
-                        self.isShow = false
+                        self.isPresented = false
                         self.isShowing = false
                         
                         self.removeFromSuperview()
                 })
                 
                 break
-            case .GrowOut:
-                UIView.animateWithDuration(0.3, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: [.CurveEaseIn], animations: {
-                    self.containerView.transform = CGAffineTransformMakeScale(1.3, 1.3)
+            case .growOut:
+                UIView.animate(withDuration: 0.3, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: [.curveEaseIn], animations: {
+                    self.containerView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
                     }, completion: { _ in
-                        UIView.animateWithDuration(0.6, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: [.CurveEaseIn], animations: {
+                        UIView.animate(withDuration: 0.6, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: [.curveEaseIn], animations: {
                             self.containerView.alpha = 0.0
-                            self.containerView.transform = CGAffineTransformMakeScale(0.01, 0.01)
+                            self.containerView.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
                             }, completion: { _ in
                                 self.isDismissing = false
-                                self.isShow = false
+                                self.isPresented = false
                                 self.isShowing = false
                                 
                                 self.removeFromSuperview()
@@ -318,7 +309,7 @@ class GDSwiftyPopup: UIView {
     
     func showCompletionBlock() -> (Bool) -> (){
         self.isDismissing = false
-        self.isShow = true
+        self.isPresented = true
         self.isShowing = false
         
         if autoDismiss{
@@ -326,17 +317,13 @@ class GDSwiftyPopup: UIView {
                 self.dismiss()
             })
         }
-        return { _ in true }
+        return { _ in Void() }
     }
 }
 
 extension GDSwiftyPopup{
-    func setDelayDuration(delayDuration: Double, task:()->()) {
-        dispatch_after(
-            dispatch_time(
-                DISPATCH_TIME_NOW,
-                Int64(delayDuration * Double(NSEC_PER_SEC))
-            ),
-            dispatch_get_main_queue(), task)
+    func setDelayDuration(_ delayDuration: Double, task:@escaping ()->()) {
+        DispatchQueue.main.asyncAfter(
+            deadline: DispatchTime.now() + Double(Int64(delayDuration * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC), execute: task)
     }
 }
