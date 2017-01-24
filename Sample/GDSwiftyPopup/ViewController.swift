@@ -58,8 +58,9 @@ class ViewController: UIViewController, DismissViewDelegate {
         //allow closing popup with touching popup view itself
         popupView.dismissOnPopupTouch = false
         
-        //create the popup view and show it in current view
-        popupView.createPopupView(self.view, centerPoint: CGPoint(x: self.view.center.x, y: self.view.center.y))
+        //create the popup view and show it in current view.
+        //if view not specified, it will take app window as root view.
+        popupView.createPopupView()
     }
         
     func onDismissed() {

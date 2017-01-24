@@ -21,7 +21,6 @@ class AlertView: UIView {
     
     override func awakeFromNib(){
         self.layer.cornerRadius = 10
-        self.translatesAutoresizingMaskIntoConstraints = false
     }
     
     func prepareView(_ title: String, confirmTitle: String){

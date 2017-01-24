@@ -11,10 +11,10 @@
 		360C78741CE63FB2003373CF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 360C78721CE63FB2003373CF /* Main.storyboard */; };
 		360C78761CE63FB2003373CF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 360C78751CE63FB2003373CF /* Assets.xcassets */; };
 		360C78791CE63FB2003373CF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 360C78771CE63FB2003373CF /* LaunchScreen.storyboard */; };
-		360C78811CE63FD1003373CF /* GDSwiftyPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 360C78801CE63FD1003373CF /* GDSwiftyPopup.swift */; };
 		360C78861CE642D3003373CF /* AlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 360C78841CE642D3003373CF /* AlertView.swift */; };
 		360C78871CE642D3003373CF /* AlertView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 360C78851CE642D3003373CF /* AlertView.xib */; };
 		361792441E2696BC002DEB88 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361792431E2696BC002DEB88 /* ViewController.swift */; };
+		36336A051E381034001D5518 /* GDSwiftyPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36336A041E381034001D5518 /* GDSwiftyPopup.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,10 +24,10 @@
 		360C78751CE63FB2003373CF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		360C78781CE63FB2003373CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		360C787A1CE63FB2003373CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		360C78801CE63FD1003373CF /* GDSwiftyPopup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GDSwiftyPopup.swift; sourceTree = "<group>"; };
 		360C78841CE642D3003373CF /* AlertView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertView.swift; sourceTree = "<group>"; };
 		360C78851CE642D3003373CF /* AlertView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AlertView.xib; sourceTree = "<group>"; };
 		361792431E2696BC002DEB88 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		36336A041E381034001D5518 /* GDSwiftyPopup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GDSwiftyPopup.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,17 +60,25 @@
 		360C786D1CE63FB2003373CF /* GDSwiftyPopup */ = {
 			isa = PBXGroup;
 			children = (
+				36336A031E381034001D5518 /* Source */,
 				360C786E1CE63FB2003373CF /* AppDelegate.swift */,
 				360C78721CE63FB2003373CF /* Main.storyboard */,
 				360C78751CE63FB2003373CF /* Assets.xcassets */,
 				360C78771CE63FB2003373CF /* LaunchScreen.storyboard */,
 				360C787A1CE63FB2003373CF /* Info.plist */,
-				360C78801CE63FD1003373CF /* GDSwiftyPopup.swift */,
 				360C78841CE642D3003373CF /* AlertView.swift */,
 				360C78851CE642D3003373CF /* AlertView.xib */,
 				361792431E2696BC002DEB88 /* ViewController.swift */,
 			);
 			path = GDSwiftyPopup;
+			sourceTree = "<group>";
+		};
+		36336A031E381034001D5518 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				36336A041E381034001D5518 /* GDSwiftyPopup.swift */,
+			);
+			path = Source;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -147,10 +155,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				360C78811CE63FD1003373CF /* GDSwiftyPopup.swift in Sources */,
 				360C78861CE642D3003373CF /* AlertView.swift in Sources */,
 				361792441E2696BC002DEB88 /* ViewController.swift in Sources */,
 				360C786F1CE63FB2003373CF /* AppDelegate.swift in Sources */,
+				36336A051E381034001D5518 /* GDSwiftyPopup.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

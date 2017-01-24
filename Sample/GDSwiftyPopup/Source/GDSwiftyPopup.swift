@@ -4,9 +4,13 @@
 //
 //  Created by Saeid Basirnia on 5/12/16.
 //  Copyright © 2016 Saeidbsn. All rights reserved.
-//  saeidbsn.com
+//
 
 import UIKit
+
+protocol GDSwiftyPopupDelegate{
+    func onPopupDismiss()
+}
 
 enum ViewDismissType: Int{
     case none
@@ -30,31 +34,34 @@ enum ViewDimmedType{
 }
 
 class GDSwiftyPopup: UIView {
-    var containerView: UIView!
-    var backgroundView: UIView!
+    var delegate: GDSwiftyPopupDelegate? = nil
+    public var containerView: UIView!
     
-    var dismissOnTouch: Bool = false
-    var dismissOnPopupTouch: Bool = false
+    open var dismissOnTouch: Bool = false
+    open var dismissOnPopupTouch: Bool = false
     
-    var isDismissing: Bool = false
-    var isShowing: Bool = false
-    var isPresented: Bool = false
+    open var isDismissing: Bool = false
+    open var isShowing: Bool = false
     
-    var autoDismiss: Bool = false
-    var autoDismissDelay: Double = 3.0
+    open var autoDismiss: Bool = false
+    open var autoDismissDelay: Double = 3.0
     
-    var showType: ViewShowType = .none
-    var dismissType: ViewDismissType = .none
-    var dimmedType: ViewDimmedType = .dimmed
+    open var showType: ViewShowType = .none
+    open var dismissType: ViewDismissType = .none
+    open var dimmedType: ViewDimmedType = .dimmed
     
+    private var backgroundView: UIView!
+    private var isPresented: Bool = false
+
     
     //Initialize view
-    init(containerView: UIView){
+    public init(containerView: UIView){
         super.init(frame: UIScreen.main.bounds)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(self.didRotate(_:)), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(didRotate(_:)), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
         
         self.containerView = containerView
+        self.containerView.translatesAutoresizingMaskIntoConstraints = false
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -62,23 +69,29 @@ class GDSwiftyPopup: UIView {
     }
     
     //Setup View
-    func createPopupView(_ inView: UIView, centerPoint: CGPoint){
+    public func createPopupView(_ onView: UIView? = nil){
+        var targetView: UIView!
+        if let target = onView{
+            targetView = target
+        }else{
+            targetView = UIApplication.shared.delegate!.window!
+        }
+
         self.setupBackgroundView()
         self.containerView.isUserInteractionEnabled = true
-        self.containerView.center = centerPoint
         self.isUserInteractionEnabled = true
         
         self.addSubview(backgroundView)
         
         self.show()
-        inView.addSubview(self)
+        targetView.addSubview(self)
         
         self.setupConstraints()
         self.layoutIfNeeded()
     }
     
     //Setup view behaviors
-    func setupBackgroundView(){
+    private func setupBackgroundView(){
         self.backgroundView = UIView()
         self.backgroundView.frame = self.frame
         self.backgroundView.isUserInteractionEnabled = true
@@ -86,7 +99,7 @@ class GDSwiftyPopup: UIView {
         if dimmedType == .clear{
             self.backgroundView.backgroundColor = UIColor.clear
         }else if dimmedType == .dimmed{
-            self.backgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.1)
+            self.backgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.4)
         }else{
             self.backgroundView.removeFromSuperview()
         }
@@ -138,7 +151,7 @@ class GDSwiftyPopup: UIView {
         }
     }
     
-    func setupConstraints(){
+    private func setupConstraints(){
         let rightConstraint = NSLayoutConstraint(
             item: self.containerView,
             attribute: .right,
@@ -155,7 +168,7 @@ class GDSwiftyPopup: UIView {
             attribute: .left,
             multiplier: 1.0,
             constant: 20)
-        let centerConstraint = NSLayoutConstraint(
+        let centerY = NSLayoutConstraint(
             item: self.containerView,
             attribute: .centerY,
             relatedBy: .equal,
@@ -163,8 +176,16 @@ class GDSwiftyPopup: UIView {
             attribute: .centerY,
             multiplier: 1.0,
             constant: 0)
-        
-        self.addConstraints([rightConstraint, leftConstraint, centerConstraint])
+        let centerX = NSLayoutConstraint(
+            item: self.containerView,
+            attribute: .centerX,
+            relatedBy: .equal,
+            toItem: self,
+            attribute: .centerX,
+            multiplier: 1.0,
+            constant: 0)
+
+        self.addConstraints([leftConstraint, rightConstraint, centerY, centerX])
     }
     
     private func show(){
@@ -227,7 +248,9 @@ class GDSwiftyPopup: UIView {
         }
     }
     
-    func dismiss(){
+    public func dismiss(_ completionTask: (() -> ())? = nil){
+        self.delegate?.onPopupDismiss()
+        
         if !isDismissing && isPresented{
             isDismissing = !isDismissing
             
@@ -252,6 +275,7 @@ class GDSwiftyPopup: UIView {
                         self.isShowing = false
                         
                         self.removeFromSuperview()
+                        completionTask?()
                 })
                 
                 break
@@ -271,6 +295,7 @@ class GDSwiftyPopup: UIView {
                                 self.isShowing = false
                                 
                                 self.removeFromSuperview()
+                                completionTask?()
                         })
                 })
                 break
@@ -283,6 +308,7 @@ class GDSwiftyPopup: UIView {
                         self.isShowing = false
                         
                         self.removeFromSuperview()
+                        completionTask?()
                 })
                 
                 break
@@ -299,6 +325,7 @@ class GDSwiftyPopup: UIView {
                                 self.isShowing = false
                                 
                                 self.removeFromSuperview()
+                                completionTask?()
                         })
                 })
                 
@@ -307,7 +334,7 @@ class GDSwiftyPopup: UIView {
         }
     }
     
-    func showCompletionBlock() -> (Bool) -> (){
+    private func showCompletionBlock() -> (Bool) -> (){
         self.isDismissing = false
         self.isPresented = true
         self.isShowing = false
@@ -322,7 +349,7 @@ class GDSwiftyPopup: UIView {
 }
 
 extension GDSwiftyPopup{
-    func setDelayDuration(_ delayDuration: Double, task:@escaping ()->()) {
+    func setDelayDuration(_ delayDuration: Double, task: @escaping ()->()) {
         DispatchQueue.main.asyncAfter(
             deadline: DispatchTime.now() + Double(Int64(delayDuration * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC), execute: task)
     }
