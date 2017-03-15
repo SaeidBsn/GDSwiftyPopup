@@ -52,12 +52,12 @@ class GDSwiftyPopup: UIView {
     
     private var backgroundView: UIView!
     private var isPresented: Bool = false
-
+    
     
     //Initialize view
     public init(containerView: UIView){
         super.init(frame: UIScreen.main.bounds)
-
+        
         NotificationCenter.default.addObserver(self, selector: #selector(didRotate(_:)), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
         
         self.containerView = containerView
@@ -76,7 +76,7 @@ class GDSwiftyPopup: UIView {
         }else{
             targetView = UIApplication.shared.delegate!.window!
         }
-
+        
         self.setupBackgroundView()
         self.containerView.isUserInteractionEnabled = true
         self.isUserInteractionEnabled = true
@@ -152,6 +152,31 @@ class GDSwiftyPopup: UIView {
     }
     
     private func setupConstraints(){
+        let height = NSLayoutConstraint(
+            item: self.containerView,
+            attribute: .height,
+            relatedBy: .lessThanOrEqual,
+            toItem: nil,
+            attribute: .notAnAttribute,
+            multiplier: 1.0,
+            constant: self.containerView.frame.height)
+        
+        let topConstraint = NSLayoutConstraint(
+            item: self.containerView,
+            attribute: .top,
+            relatedBy: .greaterThanOrEqual,
+            toItem: self,
+            attribute: .top,
+            multiplier: 1.0,
+            constant: 25)
+        let bottomConstraint = NSLayoutConstraint(
+            item: self.containerView,
+            attribute: .bottom,
+            relatedBy: .greaterThanOrEqual,
+            toItem: self,
+            attribute: .bottom,
+            multiplier: 1.0,
+            constant: -25)
         let rightConstraint = NSLayoutConstraint(
             item: self.containerView,
             attribute: .right,
@@ -184,8 +209,8 @@ class GDSwiftyPopup: UIView {
             attribute: .centerX,
             multiplier: 1.0,
             constant: 0)
-
-        self.addConstraints([leftConstraint, rightConstraint, centerY, centerX])
+        
+        self.addConstraints([leftConstraint, rightConstraint, centerY, centerX, height, topConstraint, bottomConstraint])
     }
     
     private func show(){
@@ -197,7 +222,7 @@ class GDSwiftyPopup: UIView {
                 self.addSubview(self.containerView)
                 
                 UIView.animate(withDuration: 0.1, delay: 0.0, options: [], animations: {
-                    }, completion: showCompletionBlock())
+                }, completion: showCompletionBlock())
                 
                 break
             case .slideIn:
@@ -209,7 +234,7 @@ class GDSwiftyPopup: UIView {
                 
                 UIView.animate(withDuration: 0.4, delay: 0.0, usingSpringWithDamping: 3, initialSpringVelocity: 0.2, options: UIViewAnimationOptions(), animations: {
                     self.containerView.center.y = self.center.y
-                    }, completion: showCompletionBlock())
+                }, completion: showCompletionBlock())
                 
                 break
             case .bounceIn:
@@ -221,7 +246,7 @@ class GDSwiftyPopup: UIView {
                 
                 UIView.animate(withDuration: 0.6, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.2, options: UIViewAnimationOptions(), animations: {
                     self.containerView.center.y = self.center.y
-                    }, completion: showCompletionBlock())
+                }, completion: showCompletionBlock())
                 
                 break
             case .fadeIn:
@@ -230,7 +255,7 @@ class GDSwiftyPopup: UIView {
                 self.containerView.alpha = 0.0
                 UIView.animate(withDuration: 0.5, animations: {
                     self.containerView.alpha = 1.0
-                    }, completion: showCompletionBlock())
+                }, completion: showCompletionBlock())
                 
                 break
             case .growIn:
@@ -242,7 +267,7 @@ class GDSwiftyPopup: UIView {
                 UIView.animate(withDuration: 0.6, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.2, options: [], animations: {
                     self.containerView.alpha = 1.0
                     self.containerView.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
-                    }, completion: showCompletionBlock())
+                }, completion: showCompletionBlock())
                 break
             }
         }
@@ -269,13 +294,13 @@ class GDSwiftyPopup: UIView {
                 UIView.animate(withDuration: 0.4, delay: 0.0, usingSpringWithDamping: 3, initialSpringVelocity: 0.2, options: [.curveEaseOut], animations: {
                     frame.origin.y = self.frame.height + 50
                     self.containerView.frame = frame
-                    }, completion: { _ in
-                        self.isDismissing = false
-                        self.isPresented = false
-                        self.isShowing = false
-                        
-                        self.removeFromSuperview()
-                        completionTask?()
+                }, completion: { _ in
+                    self.isDismissing = false
+                    self.isPresented = false
+                    self.isShowing = false
+                    
+                    self.removeFromSuperview()
+                    completionTask?()
                 })
                 
                 break
@@ -285,23 +310,40 @@ class GDSwiftyPopup: UIView {
                 UIView.animate(withDuration: 0.2, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.2, options: UIViewAnimationOptions(), animations: {
                     frame.origin.y -= 50
                     self.containerView.frame = frame
-                    }, completion: { _ in
-                        UIView.animate(withDuration: 0.4, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.2, options: UIViewAnimationOptions(), animations: {
-                            frame.origin.y = self.frame.height + 50
-                            self.containerView.frame = frame
-                            }, completion:  { _ in
-                                self.isDismissing = false
-                                self.isPresented = false
-                                self.isShowing = false
-                                
-                                self.removeFromSuperview()
-                                completionTask?()
-                        })
+                }, completion: { _ in
+                    UIView.animate(withDuration: 0.4, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.2, options: UIViewAnimationOptions(), animations: {
+                        frame.origin.y = self.frame.height + 50
+                        self.containerView.frame = frame
+                    }, completion:  { _ in
+                        self.isDismissing = false
+                        self.isPresented = false
+                        self.isShowing = false
+                        
+                        self.removeFromSuperview()
+                        completionTask?()
+                    })
                 })
                 break
             case .fadeOut:
                 UIView.animate(withDuration: 0.5, animations: {
                     self.containerView.alpha = 0.0
+                }, completion: { _ in
+                    self.isDismissing = false
+                    self.isPresented = false
+                    self.isShowing = false
+                    
+                    self.removeFromSuperview()
+                    completionTask?()
+                })
+                
+                break
+            case .growOut:
+                UIView.animate(withDuration: 0.3, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: [.curveEaseIn], animations: {
+                    self.containerView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+                }, completion: { _ in
+                    UIView.animate(withDuration: 0.6, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: [.curveEaseIn], animations: {
+                        self.containerView.alpha = 0.0
+                        self.containerView.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
                     }, completion: { _ in
                         self.isDismissing = false
                         self.isPresented = false
@@ -309,24 +351,7 @@ class GDSwiftyPopup: UIView {
                         
                         self.removeFromSuperview()
                         completionTask?()
-                })
-                
-                break
-            case .growOut:
-                UIView.animate(withDuration: 0.3, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: [.curveEaseIn], animations: {
-                    self.containerView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-                    }, completion: { _ in
-                        UIView.animate(withDuration: 0.6, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: [.curveEaseIn], animations: {
-                            self.containerView.alpha = 0.0
-                            self.containerView.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
-                            }, completion: { _ in
-                                self.isDismissing = false
-                                self.isPresented = false
-                                self.isShowing = false
-                                
-                                self.removeFromSuperview()
-                                completionTask?()
-                        })
+                    })
                 })
                 
                 break
