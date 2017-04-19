@@ -35,12 +35,12 @@ class ViewController: UIViewController, DismissViewDelegate {
         popupView = GDSwiftyPopup(containerView: confirmView!)
         
         //select dismiss type of popup view
-        //Options: None, BounceOut, FadeOut, SlideOut, GrowOut
+        //Options: BounceOut, FadeOut, SlideOut, GrowOut
         popupView.dismissType = .fadeOut
         
         //select show type of popup view
-        //Options: None, BounceOt, FadeIn, SlideIn, GrowIn
-        popupView.showType = .growIn
+        //Options: BounceOt, FadeIn, SlideIn, GrowIn
+        popupView.showType = .bounceIn
         
         //select if background should be dimmed or not
         //Options: Dimmed, Clear

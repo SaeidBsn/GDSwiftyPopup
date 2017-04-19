@@ -13,7 +13,6 @@ protocol GDSwiftyPopupDelegate{
 }
 
 enum ViewDismissType: Int{
-    case none
     case fadeOut
     case slideOut
     case bounceOut
@@ -21,7 +20,6 @@ enum ViewDismissType: Int{
 }
 
 enum ViewShowType: Int{
-    case none
     case fadeIn
     case slideIn
     case bounceIn
@@ -46,8 +44,8 @@ class GDSwiftyPopup: UIView {
     open var autoDismiss: Bool = false
     open var autoDismissDelay: Double = 3.0
     
-    open var showType: ViewShowType = .none
-    open var dismissType: ViewDismissType = .none
+    open var showType: ViewShowType = .fadeIn
+    open var dismissType: ViewDismissType = .fadeOut
     open var dimmedType: ViewDimmedType = .dimmed
     
     private var backgroundView: UIView!
@@ -108,49 +106,39 @@ class GDSwiftyPopup: UIView {
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let touchedRect = self.bounds.insetBy(dx: -10, dy: -10)
         
-        if touchedRect.contains(point){
-            for v in self.subviews.reversed(){
-                let cPoint = v.convert(point, from: self)
-                let hitView = v.hitTest(cPoint, with: event)
-                
-                if (hitView != nil){
-                    if dismissOnTouch{
-                        if hitView == self.backgroundView{
-                            dismiss()
-                        }
+        if !touchedRect.contains(point){
+            return nil
+        }
+        for v in self.subviews.reversed(){
+            let cPoint = v.convert(point, from: self)
+            let hitView = v.hitTest(cPoint, with: event)
+            
+            if hitView != nil{
+                if dismissOnTouch{
+                    if hitView == self.backgroundView{
+                        dismiss()
                     }
-                    if dismissOnPopupTouch{
-                        if hitView == self.containerView{
-                            dismiss()
-                        }
-                    }
-                    return hitView
                 }
+                if dismissOnPopupTouch{
+                    if hitView == self.containerView{
+                        dismiss()
+                    }
+                }
+                return hitView
             }
         }
         return nil
     }
     
-    
     //Action functions
     func didRotate(_ sender: Notification){
-        if(UIDeviceOrientationIsLandscape(UIDevice.current.orientation)){
-            guard let sView = superview else{
-                return
-            }
-            self.frame = sView.frame
-            self.backgroundView.frame = self.frame
+        guard let sView = superview else{
+            return
         }
-        
-        if(UIDeviceOrientationIsPortrait(UIDevice.current.orientation)){
-            guard let sView = superview else{
-                return
-            }
-            self.frame = sView.frame
-            self.backgroundView.frame = self.frame
-        }
+        self.frame = sView.frame
+        self.backgroundView.frame = self.frame
     }
-    
+
     private func setupConstraints(){
         let height = NSLayoutConstraint(
             item: self.containerView,
@@ -218,13 +206,6 @@ class GDSwiftyPopup: UIView {
             isShowing = !isShowing
             
             switch showType{
-            case .none:
-                self.addSubview(self.containerView)
-                
-                UIView.animate(withDuration: 0.1, delay: 0.0, options: [], animations: {
-                }, completion: showCompletionBlock())
-                
-                break
             case .slideIn:
                 self.addSubview(self.containerView)
                 
@@ -280,20 +261,13 @@ class GDSwiftyPopup: UIView {
             isDismissing = !isDismissing
             
             switch dismissType{
-            case .none:
-                self.isDismissing = false
-                self.isPresented = false
-                self.isShowing = false
-                
-                self.removeFromSuperview()
-                
-                break
             case .slideOut:
                 var frame = self.containerView.frame
                 
                 UIView.animate(withDuration: 0.4, delay: 0.0, usingSpringWithDamping: 3, initialSpringVelocity: 0.2, options: [.curveEaseOut], animations: {
                     frame.origin.y = self.frame.height + 50
                     self.containerView.frame = frame
+                    self.alpha = 0
                 }, completion: { _ in
                     self.isDismissing = false
                     self.isPresented = false
@@ -314,6 +288,7 @@ class GDSwiftyPopup: UIView {
                     UIView.animate(withDuration: 0.4, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.2, options: UIViewAnimationOptions(), animations: {
                         frame.origin.y = self.frame.height + 50
                         self.containerView.frame = frame
+                        self.alpha = 0
                     }, completion:  { _ in
                         self.isDismissing = false
                         self.isPresented = false
@@ -327,6 +302,7 @@ class GDSwiftyPopup: UIView {
             case .fadeOut:
                 UIView.animate(withDuration: 0.5, animations: {
                     self.containerView.alpha = 0.0
+                    self.alpha = 0
                 }, completion: { _ in
                     self.isDismissing = false
                     self.isPresented = false
@@ -344,6 +320,7 @@ class GDSwiftyPopup: UIView {
                     UIView.animate(withDuration: 0.6, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: [.curveEaseIn], animations: {
                         self.containerView.alpha = 0.0
                         self.containerView.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
+                        self.alpha = 0
                     }, completion: { _ in
                         self.isDismissing = false
                         self.isPresented = false
@@ -375,7 +352,7 @@ class GDSwiftyPopup: UIView {
 
 extension GDSwiftyPopup{
     func setDelayDuration(_ delayDuration: Double, task: @escaping ()->()) {
-        DispatchQueue.main.asyncAfter(
-            deadline: DispatchTime.now() + Double(Int64(delayDuration * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC), execute: task)
+        let time = DispatchTime.now() + delayDuration
+        DispatchQueue.main.asyncAfter(deadline: time, execute: task)
     }
 }
