@@ -26,7 +26,7 @@ Soon!
 
 
 # How to use
-```
+```    
     var popupView: GDSwiftyPopup!
 
     //prepare popup view with custom UIView
@@ -60,4 +60,12 @@ Soon!
     //showing on app window
     popupView.createPopupView(self.view, centerPoint: CGPointMake(self.view.center.x, self.view.center.y))
 
+
+    //to dismiss the alert use:
+    popupView.dismiss()
+
+    //or with completion
+    popupView.dismiss{
+        // some stuff to do
+    }
 ```
