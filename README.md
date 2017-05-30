@@ -7,17 +7,15 @@ Popup view can be presented on any view.
 
 
 # Requirements
-xcode 8+
-
-swift 3+
-
-iOS 8+
+-xcode 8+
+-Swift 3+
+-iOS 8+
 
 
 # Installation
 Install manually
 ------
-Drag "GDSwiftyPopup.swift" to your project and use!
+Drag `GDSwiftyPopup.swift` to your project and use!
 
 Install using Cocoapods
 ------
@@ -26,7 +24,8 @@ Soon!
 
 
 # How to use
-```    
+
+```swift 
     var popupView: GDSwiftyPopup!
 
     //prepare popup view with custom UIView
@@ -41,8 +40,8 @@ Soon!
     popupView.showType = .BounceIn
     
     //select if background should be dimmed or not
-    //Options: Dimmed, Clear
-    popupView.dimmedType = .Dimmed
+    //Options: .dimmed, clear, blurredLight, blurredDark
+    popupView.dimmedType = .blurredLight
     
     //Popup view can be automatically dismissed.
     //autoDismiss presents if it should automatically dismissed or not
