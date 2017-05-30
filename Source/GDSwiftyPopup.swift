@@ -26,7 +26,9 @@ enum ViewShowType: Int{
     case growIn
 }
 
-enum ViewDimmedType{
+enum BackgroundType{
+    case blurredLight
+    case blurredDark
     case dimmed
     case clear
 }
@@ -46,9 +48,10 @@ class GDSwiftyPopup: UIView {
     
     open var showType: ViewShowType = .fadeIn
     open var dismissType: ViewDismissType = .fadeOut
-    open var dimmedType: ViewDimmedType = .dimmed
+    open var backgroundType: BackgroundType = .dimmed
     
     private var backgroundView: UIView!
+    private var backgroundBlurredView: UIVisualEffectView!
     private var isPresented: Bool = false
     
     
@@ -79,7 +82,12 @@ class GDSwiftyPopup: UIView {
         self.containerView.isUserInteractionEnabled = true
         self.isUserInteractionEnabled = true
         
-        self.addSubview(backgroundView)
+        if let _ = backgroundBlurredView{
+            self.addSubview(backgroundBlurredView)
+        }
+        if let _ = backgroundView{
+            self.addSubview(backgroundView)
+        }
         
         self.show()
         targetView.addSubview(self)
@@ -90,16 +98,26 @@ class GDSwiftyPopup: UIView {
     
     //Setup view behaviors
     private func setupBackgroundView(){
-        self.backgroundView = UIView()
-        self.backgroundView.frame = self.frame
-        self.backgroundView.isUserInteractionEnabled = true
-        
-        if dimmedType == .clear{
-            self.backgroundView.backgroundColor = UIColor.clear
-        }else if dimmedType == .dimmed{
-            self.backgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+        if backgroundType == .blurredDark{
+            let blurEffect = UIBlurEffect(style: .dark)
+            self.backgroundBlurredView = UIVisualEffectView(effect: blurEffect)
+            self.backgroundBlurredView.frame = self.frame
+            self.backgroundBlurredView.isUserInteractionEnabled = true
+        }else if backgroundType == .blurredLight{
+            let blurEffect = UIBlurEffect(style: .light)
+            self.backgroundBlurredView = UIVisualEffectView(effect: blurEffect)
+            self.backgroundBlurredView.frame = self.frame
+            self.backgroundBlurredView.isUserInteractionEnabled = true
         }else{
-            self.backgroundView.removeFromSuperview()
+            self.backgroundView = UIView()
+            self.backgroundView.frame = self.frame
+            self.backgroundView.isUserInteractionEnabled = true
+            
+            if backgroundType == .clear{
+                self.backgroundView.backgroundColor = UIColor.clear
+            }else if backgroundType == .dimmed{
+                self.backgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+            }
         }
     }
     
@@ -115,8 +133,15 @@ class GDSwiftyPopup: UIView {
             
             if hitView != nil{
                 if dismissOnTouch{
-                    if hitView == self.backgroundView{
-                        dismiss()
+                    if let _ = self.backgroundView{
+                        if hitView == self.backgroundView{
+                            dismiss()
+                        }
+                    }
+                    if let _ = self.backgroundBlurredView{
+                        if hitView == self.backgroundBlurredView{
+                            dismiss()
+                        }
                     }
                 }
                 if dismissOnPopupTouch{
@@ -136,9 +161,14 @@ class GDSwiftyPopup: UIView {
             return
         }
         self.frame = sView.frame
-        self.backgroundView.frame = self.frame
+        if let _ = backgroundBlurredView{
+            self.backgroundBlurredView.frame = self.frame
+        }
+        if let _ = backgroundView{
+            self.backgroundView.frame = self.frame
+        }
     }
-
+    
     private func setupConstraints(){
         let height = NSLayoutConstraint(
             item: self.containerView,

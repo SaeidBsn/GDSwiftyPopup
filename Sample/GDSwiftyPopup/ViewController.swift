@@ -43,8 +43,8 @@ class ViewController: UIViewController, DismissViewDelegate {
         popupView.showType = .bounceIn
         
         //select if background should be dimmed or not
-        //Options: Dimmed, Clear
-        popupView.dimmedType = .dimmed
+        //Options: .dimmed, clear, blurredLight, blurredDark
+        popupView.backgroundType = .blurredLight
         
         //Popup view can be automatically dismissed.
         //autoDismiss presents if it should automatically dismissed or not
