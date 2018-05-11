@@ -7,20 +7,15 @@ Popup view can be presented on any view.
 
 
 # Requirements
--xcode 8+
--Swift 3+
--iOS 8+
+- Xcode 8+
+- Swift 4
+- iOS 8+
 
 
 # Installation
 Install manually
 ------
 Drag `GDSwiftyPopup.swift` to your project and use!
-
-Install using Cocoapods
-------
-Soon!
-
 
 
 # How to use
@@ -55,9 +50,9 @@ Soon!
     //allow closing popup with touching popup view itself
     popupView.dismissOnPopupTouch = false
     
-    //create the popup view and show it in current view / any view or nil for 
-    //showing on app window
-    popupView.createPopupView(self.view, centerPoint: CGPointMake(self.view.center.x, self.view.center.y))
+    //create the popup view and show it
+    //popupView.createPopupView(<#T##onView: UIView?##UIView?#>) // <- On specific view
+    popupView.createPopupView() // <- On app window
 
 
     //to dismiss the alert use:
