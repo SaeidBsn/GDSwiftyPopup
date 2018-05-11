@@ -8,56 +8,59 @@
 
 import UIKit
 
-protocol GDSwiftyPopupDelegate{
+public protocol GDSwiftyPopupDelegate: class{
     func onPopupDismiss()
 }
 
-enum ViewDismissType: Int{
+public enum ViewDismissType: Int{
     case fadeOut
     case slideOut
     case bounceOut
     case growOut
 }
 
-enum ViewShowType: Int{
+public enum ViewShowType: Int{
     case fadeIn
     case slideIn
     case bounceIn
     case growIn
 }
 
-enum BackgroundType{
+public enum BackgroundType{
     case blurredLight
     case blurredDark
     case dimmed
     case clear
 }
 
-class GDSwiftyPopup: UIView {
-    var delegate: GDSwiftyPopupDelegate? = nil
-    public var containerView: UIView!
+public final class GDSwiftyPopup: UIView {
+    public weak var delegate: GDSwiftyPopupDelegate? = nil
+    public var dismissOnTouch: Bool = false
+    public var dismissOnPopupTouch: Bool = false
+    public var autoDismiss: Bool = false
+    public var autoDismissDelay: Double = 3.0
+    public var showType: ViewShowType = .fadeIn
+    public var dismissType: ViewDismissType = .fadeOut
+    public var backgroundType: BackgroundType = .dimmed
     
-    open var dismissOnTouch: Bool = false
-    open var dismissOnPopupTouch: Bool = false
-    
-    open var isDismissing: Bool = false
-    open var isShowing: Bool = false
-    
-    open var autoDismiss: Bool = false
-    open var autoDismissDelay: Double = 3.0
-    
-    open var showType: ViewShowType = .fadeIn
-    open var dismissType: ViewDismissType = .fadeOut
-    open var backgroundType: BackgroundType = .dimmed
-    
-    private var backgroundView: UIView!
     private var backgroundBlurredView: UIVisualEffectView!
+    private var containerView: UIView!
+    private var isDismissing: Bool = false
+    private var isShowing: Bool = false
+    private var backgroundView: UIView!
     private var isPresented: Bool = false
+    private var yConstraint: NSLayoutConstraint!
     
+    //MARK: - init methods
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
     
-    //Initialize view
     public init(containerView: UIView){
         super.init(frame: UIScreen.main.bounds)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow), name:NSNotification.Name.UIKeyboardWillShow, object: nil);
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide), name:NSNotification.Name.UIKeyboardWillHide, object: nil);
         
         NotificationCenter.default.addObserver(self, selector: #selector(didRotate(_:)), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
         
@@ -65,7 +68,7 @@ class GDSwiftyPopup: UIView {
         self.containerView.translatesAutoresizingMaskIntoConstraints = false
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
     
@@ -121,7 +124,7 @@ class GDSwiftyPopup: UIView {
         }
     }
     
-    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+    override public func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let touchedRect = self.bounds.insetBy(dx: -10, dy: -10)
         
         if !touchedRect.contains(point){
@@ -155,11 +158,31 @@ class GDSwiftyPopup: UIView {
         return nil
     }
     
-    //Action functions
+    //MARK: - notification funcs
+    func keyboardWillShow(notification: NSNotification) {
+        guard let _ = yConstraint else{ return }
+        let info = notification.userInfo!
+        let keyboardFrame: CGRect = (info[UIKeyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
+        
+        self.yConstraint.constant = -keyboardFrame.size.height / 2
+        UIView.animate(withDuration: 0.1, animations: { () -> Void in
+            self.layoutIfNeeded()
+            self.superview!.layoutIfNeeded()
+        })
+    }
+    
+    func keyboardWillHide(notification: NSNotification) {
+        guard let _ = yConstraint else{ return }
+        
+        self.yConstraint.constant = 0
+        UIView.animate(withDuration: 0.1, animations: { () -> Void in
+            self.layoutIfNeeded()
+            self.superview!.layoutIfNeeded()
+        })
+    }
+
     func didRotate(_ sender: Notification){
-        guard let sView = superview else{
-            return
-        }
+        guard let sView = superview else{ return }
         self.frame = sView.frame
         if let _ = backgroundBlurredView{
             self.backgroundBlurredView.frame = self.frame
@@ -169,66 +192,87 @@ class GDSwiftyPopup: UIView {
         }
     }
     
+    //MARK: - setup constraints
     private func setupConstraints(){
-        let height = NSLayoutConstraint(
-            item: self.containerView,
-            attribute: .height,
-            relatedBy: .lessThanOrEqual,
-            toItem: nil,
-            attribute: .notAnAttribute,
-            multiplier: 1.0,
-            constant: self.containerView.frame.height)
-        
-        let topConstraint = NSLayoutConstraint(
-            item: self.containerView,
-            attribute: .top,
-            relatedBy: .greaterThanOrEqual,
-            toItem: self,
-            attribute: .top,
-            multiplier: 1.0,
-            constant: 25)
-        let bottomConstraint = NSLayoutConstraint(
-            item: self.containerView,
-            attribute: .bottom,
-            relatedBy: .greaterThanOrEqual,
-            toItem: self,
-            attribute: .bottom,
-            multiplier: 1.0,
-            constant: -25)
-        let rightConstraint = NSLayoutConstraint(
-            item: self.containerView,
-            attribute: .right,
-            relatedBy: .equal,
-            toItem: self,
-            attribute: .right,
-            multiplier: 1.0,
-            constant: -20)
-        let leftConstraint = NSLayoutConstraint(
-            item: self.containerView,
-            attribute: .left,
-            relatedBy: .equal,
-            toItem: self,
-            attribute: .left,
-            multiplier: 1.0,
-            constant: 20)
-        let centerY = NSLayoutConstraint(
-            item: self.containerView,
-            attribute: .centerY,
-            relatedBy: .equal,
-            toItem: self,
-            attribute: .centerY,
-            multiplier: 1.0,
-            constant: 0)
-        let centerX = NSLayoutConstraint(
-            item: self.containerView,
-            attribute: .centerX,
-            relatedBy: .equal,
-            toItem: self,
-            attribute: .centerX,
-            multiplier: 1.0,
-            constant: 0)
-        
-        self.addConstraints([leftConstraint, rightConstraint, centerY, centerX, height, topConstraint, bottomConstraint])
+        if #available(iOS 9.0, *) {
+            containerView.rightAnchor.constraint(equalTo: rightAnchor, constant: -20.0).isActive = true
+            containerView.leftAnchor.constraint(equalTo: leftAnchor, constant: 20.0).isActive = true
+            containerView.centerXAnchor.constraint(equalTo: centerXAnchor, constant: 0.0).isActive = true
+            containerView.heightAnchor.constraint(lessThanOrEqualToConstant: containerView.frame.height).isActive = true
+
+            yConstraint = containerView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0.0)
+            yConstraint.isActive = true
+            
+            if containerView.frame.height > UIScreen.main.bounds.height{
+                containerView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: 20.0).isActive = true
+                containerView.bottomAnchor.constraint(greaterThanOrEqualTo: bottomAnchor, constant: -20.0).isActive = true
+            }
+        } else {
+            let height = NSLayoutConstraint(
+                item: self.containerView,
+                attribute: .height,
+                relatedBy: .lessThanOrEqual,
+                toItem: nil,
+                attribute: .notAnAttribute,
+                multiplier: 1.0,
+                constant: self.containerView.frame.height)
+            
+            let topConstraint = NSLayoutConstraint(
+                item: self.containerView,
+                attribute: .top,
+                relatedBy: .greaterThanOrEqual,
+                toItem: self,
+                attribute: .top,
+                multiplier: 1.0,
+                constant: 20)
+
+            let bottomConstraint = NSLayoutConstraint(
+                item: self.containerView,
+                attribute: .bottom,
+                relatedBy: .greaterThanOrEqual,
+                toItem: self,
+                attribute: .bottom,
+                multiplier: 1.0,
+                constant: -20)
+            
+            let rightConstraint = NSLayoutConstraint(
+                item: self.containerView,
+                attribute: .right,
+                relatedBy: .equal,
+                toItem: self,
+                attribute: .right,
+                multiplier: 1.0,
+                constant: -20)
+
+            let leftConstraint = NSLayoutConstraint(
+                item: self.containerView,
+                attribute: .left,
+                relatedBy: .equal,
+                toItem: self,
+                attribute: .left,
+                multiplier: 1.0,
+                constant: 20)
+
+            let centerX = NSLayoutConstraint(
+                item: self.containerView,
+                attribute: .centerX,
+                relatedBy: .equal,
+                toItem: self,
+                attribute: .centerX,
+                multiplier: 1.0,
+                constant: 0)
+
+            self.yConstraint = NSLayoutConstraint(
+                item: self.containerView,
+                attribute: .centerY,
+                relatedBy: .equal,
+                toItem: self,
+                attribute: .centerY,
+                multiplier: 1.0,
+                constant: 0)
+            
+            self.addConstraints([leftConstraint, rightConstraint, yConstraint, centerX, height, topConstraint, bottomConstraint])
+        }
     }
     
     private func show(){
@@ -247,7 +291,7 @@ class GDSwiftyPopup: UIView {
                     self.containerView.center.y = self.center.y
                 }, completion: showCompletionBlock())
                 
-                break
+                
             case .bounceIn:
                 self.addSubview(self.containerView)
                 
@@ -259,7 +303,7 @@ class GDSwiftyPopup: UIView {
                     self.containerView.center.y = self.center.y
                 }, completion: showCompletionBlock())
                 
-                break
+                
             case .fadeIn:
                 self.addSubview(self.containerView)
                 
@@ -268,7 +312,7 @@ class GDSwiftyPopup: UIView {
                     self.containerView.alpha = 1.0
                 }, completion: showCompletionBlock())
                 
-                break
+                
             case .growIn:
                 self.addSubview(self.containerView)
                 
@@ -279,7 +323,7 @@ class GDSwiftyPopup: UIView {
                     self.containerView.alpha = 1.0
                     self.containerView.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
                 }, completion: showCompletionBlock())
-                break
+                
             }
         }
     }
@@ -307,7 +351,7 @@ class GDSwiftyPopup: UIView {
                     completionTask?()
                 })
                 
-                break
+                
             case .bounceOut:
                 var frame = self.containerView.frame
                 
@@ -328,7 +372,7 @@ class GDSwiftyPopup: UIView {
                         completionTask?()
                     })
                 })
-                break
+                
             case .fadeOut:
                 UIView.animate(withDuration: 0.5, animations: {
                     self.containerView.alpha = 0.0
@@ -342,7 +386,6 @@ class GDSwiftyPopup: UIView {
                     completionTask?()
                 })
                 
-                break
             case .growOut:
                 UIView.animate(withDuration: 0.3, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: [.curveEaseIn], animations: {
                     self.containerView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
@@ -360,8 +403,6 @@ class GDSwiftyPopup: UIView {
                         completionTask?()
                     })
                 })
-                
-                break
             }
         }
     }
