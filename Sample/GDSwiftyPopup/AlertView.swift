@@ -26,10 +26,10 @@ class AlertView: UIView {
     func prepareView(_ title: String, confirmTitle: String){
         self.titleLabel.text = title
         
-        self.dismissButton.setTitle(confirmTitle, for: UIControlState())
+        self.dismissButton.setTitle(confirmTitle, for: UIControl.State())
         self.dismissButton.backgroundColor = UIColor.red.withAlphaComponent(0.5)
         self.dismissButton.layer.cornerRadius = 4.0
-        self.dismissButton.setTitleColor(UIColor.white, for: UIControlState())
+        self.dismissButton.setTitleColor(UIColor.white, for: UIControl.State())
         
         self.layoutIfNeeded()
     }

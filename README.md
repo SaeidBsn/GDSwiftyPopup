@@ -7,8 +7,8 @@ Popup view can be presented on any view.
 
 
 # Requirements
-- Xcode 8+
-- Swift 4
+- Xcode 10+
+- Swift 4.2
 - iOS 8+
 
 
@@ -23,18 +23,18 @@ Drag `GDSwiftyPopup.swift` to your project and use!
 ```swift 
     var popupView: GDSwiftyPopup!
 
-    //prepare popup view with custom UIView
-    popupView = GDSwiftyPopup(containerView: confirmView!)
+    //Prepare popup view with custom UIView
+    popupView = GDSwiftyPopup(containerView: confirmView)
     
-    //select dismiss type of popup view
+    //Select dismiss type
     //Options: None, BounceOut, FadeOut, SlideOut, GrowOut
     popupView.dismissType = .BounceOut
     
-    //select show type of popup view
+    //Select show type
     //Options: None, BounceOt, FadeIn, SlideIn, GrowIn
     popupView.showType = .BounceIn
     
-    //select if background should be dimmed or not
+    //Select if background type
     //Options: .dimmed, clear, blurredLight, blurredDark
     popupView.dimmedType = .blurredLight
     
@@ -44,21 +44,21 @@ Drag `GDSwiftyPopup.swift` to your project and use!
     popupView.autoDismiss = false
     popupView.autoDismissDelay = 1.0
     
-    //allow closing popup with touching popup view background
+    //Allow dismissing popup with touching the background
     popupView.dismissOnTouch = false
     
-    //allow closing popup with touching popup view itself
+    //Allow dismissing popup with touching the popup view
     popupView.dismissOnPopupTouch = false
     
-    //create the popup view and show it
-    //popupView.createPopupView(<#T##onView: UIView?##UIView?#>) // <- On specific view
+    //Create the popup view and show it
+    //popupView.createPopupView(SomeSpecificView) // <- On specific view
     popupView.createPopupView() // <- On app window
 
 
-    //to dismiss the alert use:
+    //Dismiss the popup:
     popupView.dismiss()
 
-    //or with completion
+    //Dismiss with a completion
     popupView.dismiss{
         // some stuff to do
     }
