@@ -9,7 +9,7 @@ Popup view can be presented on any view.
 # Requirements
 - Xcode 10+
 - Swift 4.2
-- iOS 8+
+- iOS 9+
 
 
 # Installation

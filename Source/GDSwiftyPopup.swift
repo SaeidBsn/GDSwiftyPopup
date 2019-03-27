@@ -186,84 +186,17 @@ public final class GDSwiftyPopup: UIView {
     
     //MARK: - setup constraints
     private func setupConstraints(){
-        if #available(iOS 9.0, *){
-            containerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20.0).isActive = true
-            containerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20.0).isActive = true
-            containerView.centerXAnchor.constraint(equalTo: centerXAnchor, constant: 0.0).isActive = true
-            containerView.heightAnchor.constraint(lessThanOrEqualToConstant: containerView.frame.height).isActive = true
-            
-            yConstraint = containerView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0.0)
-            yConstraint.isActive = true
-            
-            if containerView.frame.height > UIScreen.main.bounds.height{
-                containerView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: 20.0).isActive = true
-                containerView.bottomAnchor.constraint(greaterThanOrEqualTo: bottomAnchor, constant: -20.0).isActive = true
-            }
-        }else{
-            let height = NSLayoutConstraint(
-                item: containerView,
-                attribute: .height,
-                relatedBy: .lessThanOrEqual,
-                toItem: nil,
-                attribute: .notAnAttribute,
-                multiplier: 1.0,
-                constant: containerView.frame.height)
-            
-            let topConstraint = NSLayoutConstraint(
-                item: containerView,
-                attribute: .top,
-                relatedBy: .greaterThanOrEqual,
-                toItem: self,
-                attribute: .top,
-                multiplier: 1.0,
-                constant: 20)
-            
-            let bottomConstraint = NSLayoutConstraint(
-                item: containerView,
-                attribute: .bottom,
-                relatedBy: .greaterThanOrEqual,
-                toItem: self,
-                attribute: .bottom,
-                multiplier: 1.0,
-                constant: -20)
-            
-            let rightConstraint = NSLayoutConstraint(
-                item: containerView,
-                attribute: .right,
-                relatedBy: .equal,
-                toItem: self,
-                attribute: .right,
-                multiplier: 1.0,
-                constant: -20)
-            
-            let leftConstraint = NSLayoutConstraint(
-                item: containerView,
-                attribute: .left,
-                relatedBy: .equal,
-                toItem: self,
-                attribute: .left,
-                multiplier: 1.0,
-                constant: 20)
-            
-            let centerX = NSLayoutConstraint(
-                item: containerView,
-                attribute: .centerX,
-                relatedBy: .equal,
-                toItem: self,
-                attribute: .centerX,
-                multiplier: 1.0,
-                constant: 0)
-            
-            yConstraint = NSLayoutConstraint(
-                item: containerView,
-                attribute: .centerY,
-                relatedBy: .equal,
-                toItem: self,
-                attribute: .centerY,
-                multiplier: 1.0,
-                constant: 0)
-            
-            addConstraints([leftConstraint, rightConstraint, yConstraint, centerX, height, topConstraint, bottomConstraint])
+        containerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20.0).isActive = true
+        containerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20.0).isActive = true
+        containerView.centerXAnchor.constraint(equalTo: centerXAnchor, constant: 0.0).isActive = true
+        containerView.heightAnchor.constraint(lessThanOrEqualToConstant: containerView.frame.height).isActive = true
+        
+        yConstraint = containerView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0.0)
+        yConstraint.isActive = true
+        
+        if containerView.frame.height > UIScreen.main.bounds.height{
+            containerView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: 20.0).isActive = true
+            containerView.bottomAnchor.constraint(greaterThanOrEqualTo: bottomAnchor, constant: -20.0).isActive = true
         }
     }
     
