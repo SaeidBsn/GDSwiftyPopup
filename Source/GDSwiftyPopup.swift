@@ -163,7 +163,7 @@ public final class GDSwiftyPopup: UIView {
         yConstraint.constant = -keyboardFrame.size.height / 2
         UIView.animate(withDuration: 0.1, animations: { () -> Void in
             self.layoutIfNeeded()
-            self.superview!.layoutIfNeeded()
+            self.superview?.layoutIfNeeded()
         })
     }
     
@@ -173,7 +173,7 @@ public final class GDSwiftyPopup: UIView {
         yConstraint.constant = 0
         UIView.animate(withDuration: 0.1, animations: { () -> Void in
             self.layoutIfNeeded()
-            self.superview!.layoutIfNeeded()
+            self.superview?.layoutIfNeeded()
         })
     }
     
@@ -189,13 +189,13 @@ public final class GDSwiftyPopup: UIView {
         containerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20.0).isActive = true
         containerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20.0).isActive = true
         containerView.centerXAnchor.constraint(equalTo: centerXAnchor, constant: 0.0).isActive = true
-        containerView.heightAnchor.constraint(lessThanOrEqualToConstant: containerView.frame.height).isActive = true
+        containerView.heightAnchor.constraint(equalToConstant: containerView.frame.height).isActive = true
         
         yConstraint = containerView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0.0)
         yConstraint.isActive = true
         
         if containerView.frame.height > UIScreen.main.bounds.height{
-            containerView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: 20.0).isActive = true
+            containerView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: 45).isActive = true
             containerView.bottomAnchor.constraint(greaterThanOrEqualTo: bottomAnchor, constant: -20.0).isActive = true
         }
     }
@@ -280,22 +280,17 @@ public final class GDSwiftyPopup: UIView {
             case .bounceOut:
                 var frame = containerView.frame
                 
-                UIView.animate(withDuration: 0.2, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.2, options: UIView.AnimationOptions(), animations: {
-                    frame.origin.y -= 50
+                UIView.animate(withDuration: 0.4, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.2, options: UIView.AnimationOptions(), animations: {
+                    frame.origin.y = self.frame.height + 50
                     self.containerView.frame = frame
-                }, completion: { _ in
-                    UIView.animate(withDuration: 0.4, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.2, options: UIView.AnimationOptions(), animations: {
-                        frame.origin.y = self.frame.height + 50
-                        self.containerView.frame = frame
-                        self.alpha = 0
-                    }, completion:  { _ in
-                        self.isDismissing = false
-                        self.isPresented = false
-                        self.isShowing = false
-                        
-                        self.removeFromSuperview()
-                        completionTask?()
-                    })
+                    self.alpha = 0
+                }, completion:  { _ in
+                    self.isDismissing = false
+                    self.isPresented = false
+                    self.isShowing = false
+                    
+                    self.removeFromSuperview()
+                    completionTask?()
                 })
                 
             case .fadeOut:
